@@ -4,7 +4,7 @@ width = int(input('Введите ширину змеи: '))
 
 for i in range(height // 2):
     print(symbol * width)
-    str = ' ' * (width - 1) + symbol
+    str = symbol.rjust(width,' ')
     if i % 2 == 0:
         print(str,sep='')
     else:
