@@ -1,8 +1,7 @@
 import string
 
-#width = int(input('Введите ширину шахматной доски: '))
-#height = int(input('Введите высоту шахматной доски: '))
-width = 8; height = 8
+width = int(input('Введите ширину шахматной доски: '))
+height = int(input('Введите высоту шахматной доски: '))
 letters = string.ascii_lowercase + string.ascii_uppercase
 
 white = '██'
@@ -21,17 +20,15 @@ for i in range(width):
     st.append(symbol)
     
 def reverse_line(line):
-    return line[::-1]
+    return list(map(reverse,line))
 
 for j in range(1,height + 1):
     st = reverse_line(st)
-    print(f'{black}{j} |{"".join(st)}{black.rstrip()}|{j}',end='')
+    if j >= 10:
+        print(f'{black}{j}|{"".join(st)}{black.rstrip()}|{j}',end='')
+    else:
+        print(f'{black}{j} |{"".join(st)}{black.rstrip()}|{j}',end='')
     print(black)
 
 print(''.rjust(width*3,line))
 print(f'{" " * 4}|{" ".join(letters[:width])}| ')
-
-
-
-
-print('\033[0m')
