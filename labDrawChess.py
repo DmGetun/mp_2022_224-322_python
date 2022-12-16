@@ -27,7 +27,7 @@ for j in range(1,height + 1):
     if j >= 10:
         print(f'{black}{j}|{"".join(st)}{black.rstrip()}|{j}',end='')
     else:
-        print(f'{black}{j} |{"".join(st)}{black.rstrip()}|{j}',end='')
+        print(f'{black} {j}|{"".join(st)}{black.rstrip()}|{j}',end='')
     print(black)
 
 print(''.rjust(width*3,line))
