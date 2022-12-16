@@ -7,7 +7,7 @@ def bg(text,color):
 
 def print_colors(row, func, end="\n"):
     for col in range(1,7):
-        color = row*6 + col
+        color = row * 6 + col
         text = f"{color:3d}"
         print (func(text,color), end=" ")
         
