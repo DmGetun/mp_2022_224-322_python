@@ -27,48 +27,52 @@ def init_maze():
 def is_finish(data, current_row, current_col):
     rows = len(data)
     cols = len(data[0])
+
+    if data[current_row][current_col] == 1:
+        return False
+
     if current_row + 1 >= rows or current_row - 1 <= 0:
         return True
     
     if current_col + 1 >= cols or current_col - 1 <= 0:
         return True
+
     
     return False
 
-def up(data,current_row, current_col):
+def up(current_row, current_col):
     new_row = current_row - 1
     new_col = current_col
-    data[new_row][new_col] = 2
     return (new_row, new_col)
 
-def right(data, current_row, current_col):
+def right(current_row, current_col):
     new_row = current_row
     new_col = current_col + 1
-    data[new_row][new_col] = 2
     return (new_row, new_col) 
 
-def down(data, current_row, current_col):
+def down(current_row, current_col):
     new_row = current_row + 1
     new_col = current_col
-    data[new_row][new_col] = 2
     return (new_row, new_col) 
 
-def left(data, current_row, current_col):
+def left(current_row, current_col):
     new_row = current_row
     new_col = current_col - 1
-    data[new_row][new_col] = 2
     return (new_row, new_col)
 
 previous_coords = []
 
-def check_move(current_row, current_col):
+def check_move(data, current_row, current_col):
     rows = maze_info['rows']
     cols = maze_info['cols']
+
+    rows = len(data)
+    cols = len(data[0])
     
-    if current_row - 1 <= 0 or current_row + 1 >= rows:
+    if current_row - 1 < 0 or current_row + 1 >= rows:
         return False
     
-    if current_col - 1 <= 0 or current_col + 1 >= cols:
+    if current_col - 1 < 0 or current_col + 1 >= cols:
         return False
     
     if (current_row, current_col) in previous_coords:
@@ -77,14 +81,33 @@ def check_move(current_row, current_col):
     return True
     
 
-def move(data, current_row, current_col):
-    directions = [up,right,down,left]
-    direction = random.choice(directions)
-    previous_coords.append((current_row, current_col))
-    current_row, current_col = direction(data, current_row, current_col)
+def choose_direction(maze, current_row, current_col):
+    directions = [up, right, down, left]
+
+    rows = len(maze)
+    cols = len(maze[0])
+
+    if current_row == 0:
+        return down
     
-    if check_move(current_row, current_col):
-        dig(data,current_row, current_col)
+    elif current_row == rows - 1:
+        return up
+
+    elif current_col == 0:
+        return right
+
+    elif current_col == cols - 1:
+        return left
+
+    return random.choice(directions)
+
+
+def move(data, current_row, current_col):
+    direction = choose_direction(data, current_row, current_col)
+    previous_coords.append((current_row, current_col))
+    current_row, current_col = direction(current_row, current_col)
+    
+    if check_move(data, current_row, current_col):
         return current_row, current_col
     
     return previous_coords[-1]
@@ -128,27 +151,27 @@ def additional_dig(data, current_row, current_col):
     
 
 def dig(data, current_row, current_col):
-    print_maze(data)
     time.sleep(0.5)
-    number = random.randint(0,1)
-    if number == 1:
-        additional_dig(data, current_row, current_col)
+
+    data[current_row][current_col] = 2
     
-    while True:
-        if is_finish(data, current_row, current_col):
-            break
-        
-    
+    print_maze(data)
     if is_finish(data, current_row, current_col):
-        return False
+        return True
+    return False
+    
+        
     
         
 def start_game():
     maze = init_maze()
     current_row, current_col = init_start(maze, height, width)
-    generate = True 
+    generate = True
     while generate:
-        dig(maze, current_row, current_col)
+        current_row, current_col = move(maze,current_row, current_col)
+        c = dig(maze, current_row, current_col)
+        if c is True:
+            return maze
     
 
 def print_maze(maze):
