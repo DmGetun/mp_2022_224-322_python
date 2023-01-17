@@ -213,18 +213,23 @@ class DataBase:
         
         return filename_db[0]
     
-    def update_file(self, filename, st_mode, st_atime, st_mtime, st_ctime, content):
+    def update_file(self, filename, stmode, atime, mtime, ctime, content):
         con = sqlite3.connect(self.path)
         cursor = con.cursor()
+        
+        stmode = datetime.fromtimestamp(stmode).strftime('%Y-%m-%d %H:%M:%S')
+        atime = datetime.fromtimestamp(atime).strftime('%Y-%m-%d %H:%M:%S')
+        mtime = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
+        ctime = datetime.fromtimestamp(ctime).strftime('%Y-%m-%d %H:%M:%S')
         
         query = f'''
             UPDATE {file_info_table} 
             SET
                 filename='{filename}',
-                stmode={st_mode},
-                atime={st_atime},
-                mtime={st_mtime},
-                ctime={st_ctime},
+                stmode='{stmode}',
+                atime='{atime}',
+                mtime='{mtime}',
+                ctime='{ctime}',
                 content=' '
             WHERE filename='{filename}';
         '''

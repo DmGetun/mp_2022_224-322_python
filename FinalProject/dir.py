@@ -19,11 +19,12 @@ class Dir:
         for file in os.listdir(src_path):
             file_path = os.path.join(os.path.abspath(src_path), file)
             _, file_ext = os.path.splitext(file_path)
+            file_ext = file_ext[1:]
             
             if os.path.isfile(file_path):
-                if include_types is not None and file_ext in include_types:
+                if include_types is not None and file_ext in ' '.join(include_types):
                     files.append(file_path)
-                elif exclude_types is not None and file_ext not in exclude_types:
+                elif exclude_types is not None and file_ext not in ' '.join(exclude_types):
                     files.append(file_path)
                 elif exclude_types is None and include_types is None:
                     files.append(file_path)

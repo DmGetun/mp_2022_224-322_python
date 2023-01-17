@@ -73,14 +73,13 @@ class Synchronizer:
         part_src: str = part_src.removesuffix(file_name)
         part_src = part_src.removeprefix('\\')
 
-        if os.path.isdir(part_src) and len(part_src) >= 0:
-            if not os.path.exists(os.path.join(dest, part_src)):
-                os.makedirs(os.path.join(dest, part_src))
+        if not os.path.exists(os.path.join(dest, part_src)):
+            os.makedirs(os.path.join(dest, part_src))
 
         path_for_copy = os.path.join(dest,part_src,file_name) if len(part_src) >= 0 else os.path.join(dest,file_name)
     
         try:
-            shutil.copy2(src, path_for_copy)
+            shutil.copy2(src, os.path.dirname(path_for_copy))
             log_message = f"Файл {src} был синхронизирован с {path_for_copy}"
             Logger.log(log_message, self.log)
         except shutil.SameFileError:

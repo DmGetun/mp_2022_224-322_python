@@ -1,1 +1,3 @@
 python main.py --source . --destination ./sync_dir
+
+python main.py --source "D:\test_sync" --destination "D:\dir_to_sync"

@@ -38,7 +38,28 @@ if len(args.source) > 0 or len(args.destination) > 0:
     if len(args.id) > 0:
         raise IllegalArgumentError("Невозможно выполнить синхронизацию с указанным флагом --id и --source или --destination вместе")
 
-
+def create_bat(src, dest, include, exclude, depth, id, log):
+    command = "python C:\Универ\Современные технологии программирования\питон\mp_2022_224-322_python\FinalProject\main.py"
+    if src is not None:
+        command += f' --source {src}'
+    if dest is not None:
+        command += f' --destination {dest}'
+    if include is not None:
+        command += f' --include {include}'
+    if exclude is not None:    
+        command += f' --exclude {exclude}'
+    if depth is not None:
+        command += f' --depth {depth}'
+    if id is not None:
+        command += f' --id {id}'
+    if log is not None:
+        command += f' --log {log}'
+        
+    command += '\n pause'
+        
+    with open('synchronize.bat','w',encoding='utf-8') as w:
+        w.write(command)
+    
 
 db = DataBase('./test.db')
 db.create_database()
@@ -46,8 +67,8 @@ db.create_tables()
 
 src_path = args.source[0] if len(args.source) > 0 else '.'
 dest_path = args.destination[0] if len(args.destination) > 0 else '.'
-include_files = args.include[0] if len(args.include) > 0 else None
-exclude_files = args.exclude[0] if len(args.exclude) > 0 else None
+include_files = args.include if len(args.include) > 0 else None
+exclude_files = args.exclude if len(args.exclude) > 0 else None
 depth = args.depth[0] if len(args.depth) > 0 else None
 id = args.id[0] if len(args.id) > 0 else None
 log = args.log[0] if len(args.log) > 0 else './log.txt'
@@ -58,16 +79,20 @@ if args.show is not None:
     for info in all_sync:
         p.add_row(info)
     print(p)
-    exit()
-    
-     
+    exit()    
 
 
 # ДЛЯ ТЕСТОВ!
-src_path = os.path.join(os.path.abspath(src_path))
-dest_path = os.path.join(os.path.abspath(src_path),'sync_dir')
+
+#src_path = "D:\\test_sync"
+#dest_path = "D:\dir_to_sync"
+
+#src_path = os.path.join(os.path.abspath(src_path))
+#dest_path = os.path.join(os.path.abspath(dest_path))
+#exclude_files = ['pdf']
 #id = 1
 
+create_bat(src_path, dest_path, include_files, exclude_files, depth, id, log)   
 
 files = Dir.recursive_walk(src_path,0,depth,include_files,exclude_files)
 
