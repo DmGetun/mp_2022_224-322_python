@@ -27,7 +27,7 @@ parser.add_argument('--depth', nargs='+', default='') # вложенность
 parser.add_argument('--db', nargs='+', default='') # путь к базе данных
 parser.add_argument('--log', nargs='+', default='') # путь к файлу, где будут храниться логи
 parser.add_argument('--id', nargs='+', default='') # синхронизация по id в БД
-parser.add_argument('--show', nargs='+', default='') # показать существующие синхронизации
+parser.add_argument('--show', nargs=argparse.REMAINDER) # показать существующие синхронизации
 
 args = parser.parse_args()
 
@@ -51,10 +51,9 @@ exclude_files = args.exclude[0] if len(args.exclude) > 0 else None
 depth = args.depth[0] if len(args.depth) > 0 else None
 id = args.id[0] if len(args.id) > 0 else None
 log = args.log[0] if len(args.log) > 0 else './log.txt'
-is_show = len(args.show) > 0
 
-if is_show:
-    db = DataBase()
+
+if args.show is not None:
     all_sync = db.get_all_sync()
     for info in all_sync:
         p.add_row(info)
@@ -67,11 +66,10 @@ if is_show:
 # ДЛЯ ТЕСТОВ!
 src_path = os.path.join(os.path.abspath(src_path))
 dest_path = os.path.join(os.path.abspath(src_path),'sync_dir')
-id = 1
+#id = 1
 
 
 files = Dir.recursive_walk(src_path,0,depth,include_files,exclude_files)
 
 synchronizer = Synchronizer(files, src_path, dest_path, log, db, id)
 synchronizer.synchronize()
-

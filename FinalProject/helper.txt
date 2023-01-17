@@ -1,1 +1,1 @@
-python3 main.py --source . --destination ./sync_dir
+python main.py --source . --destination ./sync_dir
