@@ -1,2 +1,2 @@
-python C:\РЈРЅРёРІРµСЂ\РЎРѕРІСЂРµРјРµРЅРЅС‹Рµ С‚РµС…РЅРѕР»РѕРіРёРё РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёСЏ\РїРёС‚РѕРЅ\mp_2022_224-322_python\FinalProject\main.py --source D:\test_sync --destination D:\dir_to_sync --exclude ['pdf'] --log ./log.txt
+python C:\Универ\Современные технологии программирования\питон\mp_2022_224-322_python\FinalProject\main.py --source C:\Универ\Современные технологии программирования\питон\mp_2022_224-322_python\FinalProject\for_testing\from_dir --destination C:\Универ\Современные технологии программирования\питон\mp_2022_224-322_python\FinalProject\for_testing\to_dir --log ./log.txt
  pause

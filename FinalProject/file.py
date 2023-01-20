@@ -1,6 +1,7 @@
 import os
 from abc import abstractmethod
-import shutil 
+import shutil
+import hashlib
 
 class FileReader:
     
@@ -14,13 +15,20 @@ class FileReader:
 
     def get_info(self):
         stat = self._read_info()
-        with open(self.path, 'rb') as f:
-            content = f.read()
+        hash = self.get_hash()
             
-        return stat, content
+        return stat, hash
             
     def synchronize(self, dest_path):
         shutil.copy2(self.path, dest_path)
+        
+        
+    def get_hash(self):
+        with open(self.path, 'rb') as f:
+            data = f.read()
+            digest = hashlib.sha256(data)
+        
+        return digest.hexdigest()
         
         
     

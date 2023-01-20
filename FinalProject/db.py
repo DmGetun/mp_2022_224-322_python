@@ -30,11 +30,11 @@ class DataBase:
             CREATE TABLE IF NOT EXISTS {file_info_table} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 filename VARCHAR(255),
-                stmode datetime, --права пользователя
+                stmode INTEGER, --права пользователя
                 atime datetime, --время последнего доступа к файлу
                 mtime datetime, --время последнего изменения файла
                 ctime datetime, --время последнего изменения прав доступа или владельца
-                content TEXT --содержимое файла
+                hash VARCHAR(256) -- хэш файла
             );
         '''
         
@@ -71,19 +71,18 @@ class DataBase:
         return self.cursor.execute("select name from sqlite_master where type='table';").fetchall()
     
     
-    def insert_file_info(self, name, stmode, atime, mtime, ctime, content):
+    def insert_file_info(self, name, stmode, atime, mtime, ctime, hash):
         con = sqlite3.connect(self.path)
         con.text_factory = str
         cursor = con.cursor()
         
-        stmode = datetime.fromtimestamp(stmode).strftime('%Y-%m-%d %H:%M:%S')
         atime = datetime.fromtimestamp(atime).strftime('%Y-%m-%d %H:%M:%S')
         mtime = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
         ctime = datetime.fromtimestamp(ctime).strftime('%Y-%m-%d %H:%M:%S')
         
         query = f'''
-            INSERT INTO {file_info_table} (filename, stmode, atime, mtime, ctime, content) VALUES
-            ('{name}', '{stmode}', '{atime}', '{mtime}', '{ctime}', ' ');
+            INSERT INTO {file_info_table} (filename, stmode, atime, mtime, ctime, hash) VALUES
+            ('{name}', {stmode}, '{atime}', '{mtime}', '{ctime}', '{hash}');
         '''
         cursor.execute(query)
         con.commit()
@@ -106,6 +105,48 @@ class DataBase:
         con.commit()
         self.close_db(con,cursor)
         
+    def get_hash_file(self, filename):
+        con = sqlite3.connect(self.path)
+        cursor = con.cursor()
+        
+        query = f'''
+            SELECT hash
+            FROM {file_info_table}
+            WHERE filename = '{filename}'
+        '''
+        cursor.execute(query)
+        hash = cursor.fetchone()
+        self.close_db(con, cursor)
+        return hash[0] if hash is not None else None
+    
+
+    def get_files_on_sync_id(self, last_id):
+        con = sqlite3.connect(self.path)
+        cursor = con.cursor()
+        
+        query = f'''
+            select source_path, filename from {sync_info_table} s
+            left join {file_info_table} f
+            on s.file_id = f.id
+            where sync_id = {last_id}
+        '''
+        cursor.execute(query)
+        
+        data = cursor.fetchall()
+        self.close_db(con, cursor)
+        if data is None:
+            return None 
+        result = []
+        for d in data:
+            dst = d[0]
+            name: str = d[1]
+            
+            name = name.removeprefix(dst)
+            result.append(name.removeprefix('\\'))
+            
+        return result
+        
+        
     def get_last_modified_time(self,filename):
         con = sqlite3.connect(self.path)
         cursor = con.cursor()
@@ -119,6 +160,7 @@ class DataBase:
         cursor.execute(query)
         
         data = cursor.fetchone()
+        self.close_db(con, cursor)
         return data[0] if data is not None else None
     
     def get_all_sync(self):
@@ -180,7 +222,19 @@ class DataBase:
         
         self.close_db(con,cursor)
         
-        return data 
+        return data
+    
+    def update_sync_time(self, id):
+        
+        query = f'''
+            UPDATE {sync_info_table}
+            SET sync_time = datetime('now')
+            WHERE sync_id = {id}
+        '''
+        con = sqlite3.connect(self.path)
+        cursor = con.cursor()
+        cursor.execute(query)
+        self.close_db(con,cursor)
     
     def get_last_sync_id(self):
         
@@ -213,11 +267,10 @@ class DataBase:
         
         return filename_db[0]
     
-    def update_file(self, filename, stmode, atime, mtime, ctime, content):
+    def update_file(self, filename, stmode, atime, mtime, ctime, hash):
         con = sqlite3.connect(self.path)
         cursor = con.cursor()
         
-        stmode = datetime.fromtimestamp(stmode).strftime('%Y-%m-%d %H:%M:%S')
         atime = datetime.fromtimestamp(atime).strftime('%Y-%m-%d %H:%M:%S')
         mtime = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
         ctime = datetime.fromtimestamp(ctime).strftime('%Y-%m-%d %H:%M:%S')
@@ -226,11 +279,11 @@ class DataBase:
             UPDATE {file_info_table} 
             SET
                 filename='{filename}',
-                stmode='{stmode}',
+                stmode={stmode},
                 atime='{atime}',
                 mtime='{mtime}',
                 ctime='{ctime}',
-                content=' '
+                hash='{hash}'
             WHERE filename='{filename}';
         '''
         
